@@ -10,7 +10,22 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        return Task::where('api_client_id', $request->user()->id)->get();
+        $query = Task::query()
+            ->where('api_client_id', $request->user()->id);
+
+        if ($request->filled('assigned_email')) {
+            $query->where('assigned_email', $request->assigned_email);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        return $query->latest()->paginate(50);
     }
 
     public function store(Request $request)
@@ -39,7 +54,14 @@ class TaskController extends Controller
     {
         $this->authorizeTask($task);
 
-        $task->update($request->all());
+        $task->update($request->only([
+            'title',
+            'description',
+            'status',
+            'assigned_email',
+            'due_at',
+            'project_id',
+        ]));
 
         return $task;
     }

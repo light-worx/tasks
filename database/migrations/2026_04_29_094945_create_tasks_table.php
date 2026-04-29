@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('assigned_email')->index();
             $table->timestamp('due_at')->nullable();
             $table->string('status')->default('pending'); // pending, done, cancelled
+            $table->integer('project_id')->nullable();
             $table->timestamps();
         });
     }
