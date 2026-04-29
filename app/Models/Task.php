@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    //
+    public $table = 'tasks';
+    protected $guarded = ['id'];
 }
