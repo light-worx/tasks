@@ -10,13 +10,21 @@ class TaskMetaController extends Controller
 {
     public function index()
     {
-        return Cache::remember('tasks.meta', 3600, function () {
-            return [
-                'statuses' => TaskStatus::query()
-                    ->where('is_active', true)
+        // 1. Fetch the data
+        $statuses = TaskStatus::where('is_active', true)
                     ->orderBy('sort_order')
-                    ->get(['id', 'label', 'colour']),
-            ];
+                    ->get();
+
+        // 2. The "Nuclear" Serialization Purge
+        // We encode to JSON and immediately decode to an associative array.
+        // This physically strips all PHP class information.
+        $pureArray = json_decode($statuses->toJson(), true);
+
+        // 3. Cache the PURE array, not the Collection object
+        $data = Cache::remember('tasks_api.meta', 3600, function () use ($pureArray) {
+            return ['statuses' => $pureArray];
         });
+
+        return response()->json($data);
     }
 }
