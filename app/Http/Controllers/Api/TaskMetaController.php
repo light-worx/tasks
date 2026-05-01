@@ -15,7 +15,7 @@ class TaskMetaController extends Controller
                 'statuses' => TaskStatus::query()
                     ->where('is_active', true)
                     ->orderBy('sort_order')
-                    ->get(['id', 'label', 'color']),
+                    ->get(['id', 'label', 'colour']),
             ];
         });
     }

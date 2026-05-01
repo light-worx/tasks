@@ -10,7 +10,7 @@ Route::post('/clients/register', [ClientAuthController::class, 'register']);
 Route::post('/clients/token', [ClientAuthController::class, 'token']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('tasks', TaskController::class);
+    Route::get('tasks/meta', [TaskMetaController::class, 'index']);
     Route::get('tasks/assignee/{email}', [TaskQueryController::class, 'byAssignee']);
-    Route::get('/tasks/meta', [TaskMetaController::class, 'index']);
+    Route::apiResource('tasks', TaskController::class);
 });
