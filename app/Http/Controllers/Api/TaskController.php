@@ -10,11 +10,12 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Task::query()
-            ->where('api_client_id', $request->user()->id);
+        $query = Task::query();
 
         if ($request->filled('assigned_email')) {
             $query->where('assigned_email', $request->assigned_email);
+        } else {
+            $query->where('api_client_id', $request->user()->id);
         }
 
         if ($request->filled('status')) {
