@@ -78,6 +78,11 @@ class TaskController extends Controller
 
     private function authorizeTask(Task $task)
     {
-        abort_unless($task->api_client_id === auth()->id(), 403);
+        $ownedByClient = $task->api_client_id === auth()->id();
+        $assignedToUser = $task->assigned_email && 
+                        request()->filled('assigned_email') && 
+                        $task->assigned_email === request()->assigned_email;
+
+        abort_unless($ownedByClient || $assignedToUser, 403);
     }
 }
