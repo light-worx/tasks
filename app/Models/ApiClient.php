@@ -17,17 +17,6 @@ class ApiClient extends Authenticatable
         'client_secret',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($client) {
-
-            $client->client_id ??= 'cli_' . Str::random(24);
-            if (!$client->client_secret) {
-                $client->client_secret = Hash::make(Str::random(64));
-            }
-        });
-    }
-
     public function organisation()
     {
         return $this->belongsTo(Organisation::class);

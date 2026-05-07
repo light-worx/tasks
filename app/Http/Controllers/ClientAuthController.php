@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ApiClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class ClientAuthController extends Controller
@@ -20,7 +21,7 @@ class ClientAuthController extends Controller
         $client = ApiClient::create([
             'name' => $validated['name'],
             'email' => $validated['email'] ?? null,
-            'client_secret' => hash('sha256', $plainSecret),
+            'client_secret' => Hash::make($plainSecret),
             'status' => 'active', // or 'pending' if you want approval flow
         ]);
 
@@ -43,7 +44,7 @@ class ClientAuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        if (! hash_equals($client->client_secret, hash('sha256', $validated['client_secret']))) {
+        if (! Hash::check($validated['client_secret'], $client->client_secret)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 

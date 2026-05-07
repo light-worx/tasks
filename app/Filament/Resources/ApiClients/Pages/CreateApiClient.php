@@ -14,12 +14,9 @@ class CreateApiClient extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $plainSecret = Str::random(64);
-
-        // store for redirect (IMPORTANT)
         $this->data['plain_secret'] = $plainSecret;
-
+        $data['client_id'] = 'cli_' . Str::random(24);
         $data['client_secret'] = Hash::make($plainSecret);
-
         return $data;
     }
 
