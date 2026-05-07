@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskMetaController;
 use App\Http\Controllers\Api\TaskQueryController;
@@ -13,4 +14,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('tasks/meta', [TaskMetaController::class, 'index']);
     Route::get('tasks/assignee/{email}', [TaskQueryController::class, 'byAssignee']);
     Route::apiResource('tasks', TaskController::class);
+    Route::apiResource('projects', ProjectController::class);
 });

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('task_statuses', function (Blueprint $table) {
-            $table->string('id')->primary(); // e.g. pending, completed
+            $table->id(); 
             $table->string('label');
             $table->string('colour')->nullable();
             $table->integer('sort_order')->default(0);

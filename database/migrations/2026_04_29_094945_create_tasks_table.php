@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('api_client_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('assigned_email')->index();
             $table->timestamp('due_at')->nullable();
-            $table->string('status'); // pending, done, cancelled
-            $table->integer('project_id')->nullable();
+            $table->string('status');
+            $table->foreignId('organisation_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('created_by_client_id')->nullable()->constrained('api_clients')->nullOnDelete();
+            $table->foreignId('project_id');
             $table->timestamps();
         });
     }

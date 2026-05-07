@@ -2,22 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 
 class ApiClient extends Authenticatable
 {
     use HasApiTokens;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'client_id',
-        'client_secret',
-        'status',
-    ];
+    protected $guarded = ['id'];
 
     protected $hidden = [
         'client_secret',
@@ -26,12 +20,16 @@ class ApiClient extends Authenticatable
     protected static function booted()
     {
         static::creating(function ($client) {
-            $client->client_id = 'cli_' . Str::random(24);
+
+            $client->client_id ??= 'cli_' . Str::random(24);
+            if (!$client->client_secret) {
+                $client->client_secret = Hash::make(Str::random(64));
+            }
         });
     }
 
-    public function isActive(): bool
+    public function organisation()
     {
-        return $this->status === 'active';
+        return $this->belongsTo(Organisation::class);
     }
 }

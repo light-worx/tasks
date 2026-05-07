@@ -10,13 +10,7 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Task::query();
-
-        if ($request->filled('assigned_email')) {
-            $query->where('assigned_email', $request->assigned_email);
-        } else {
-            $query->where('api_client_id', $request->user()->id);
-        }
+        $query = $this->visibleTasks($request);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -40,7 +34,8 @@ class TaskController extends Controller
 
         return Task::create([
             ...$validated,
-            'api_client_id' => $request->user()->id,
+            'organisation_id' => $request->user()->organisation_id,
+            'created_by_client_id' => $request->user()->id,
         ]);
     }
 
@@ -78,11 +73,38 @@ class TaskController extends Controller
 
     private function authorizeTask(Task $task)
     {
-        $ownedByClient = $task->api_client_id === auth()->id();
-        $assignedToUser = $task->assigned_email && 
-                        request()->filled('assigned_email') && 
-                        $task->assigned_email === request()->assigned_email;
+        abort_unless(
+            $task->organisation_id === auth()->user()->organisation_id,
+            403
+        );
+    }
 
-        abort_unless($ownedByClient || $assignedToUser, 403);
+    private function visibleTasks(Request $request)
+    {
+        $client = $request->user();
+
+        $query = Task::query()
+            ->where(
+                'organisation_id',
+                $client->organisation_id
+            );
+
+        // Admin/global within organisation
+        if ($client->can_view_all_tasks) {
+            return $query;
+        }
+
+        // Personal task lookup
+        if (
+            $client->can_lookup_assigned_tasks &&
+            $request->filled('assigned_email')
+        ) {
+            return $query->where(
+                'assigned_email',
+                $request->assigned_email
+            );
+        }
+
+        return $query;
     }
 }

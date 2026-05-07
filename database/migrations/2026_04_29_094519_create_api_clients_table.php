@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('client_id')->unique();
             $table->string('client_secret'); // hashed
             $table->string('status')->default('pending'); // pending, active, suspended
+            $table->foreignId('organisation_id')->nullable()->constrained()->nullOnDelete();
+            $table->boolean('can_view_all_tasks')->default(false);
+            $table->boolean('can_lookup_assigned_tasks')->default(false);
             $table->timestamp('last_used_at')->nullable();
             $table->timestamps();
         });
