@@ -32,4 +32,9 @@ class ApiClient extends Authenticatable
     {
         return $this->belongsTo(Organisation::class);
     }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
 }
