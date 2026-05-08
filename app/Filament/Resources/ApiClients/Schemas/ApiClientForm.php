@@ -19,9 +19,13 @@ class ApiClientForm
                 TextInput::make('email')
                     ->label('Email address')
                     ->email(),
-                TextInput::make('status')
+                Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'pending' => 'Pending',
+                    ])
                     ->required()
-                    ->default('pending'),
+                    ->default('active'),
                 Select::make('organisation_id')
                     ->relationship('organisation', 'name'),
                 Toggle::make('can_view_all_tasks')
