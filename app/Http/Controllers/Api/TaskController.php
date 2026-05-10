@@ -20,7 +20,9 @@ class TaskController extends Controller
             $query->where('project_id', $request->project_id);
         }
 
-        return $query->latest()->paginate(50);
+        return $query
+            ->latest()
+            ->paginate(50);
     }
 
     public function store(Request $request)
@@ -30,53 +32,69 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'assigned_email' => 'required|email',
             'due_at' => 'nullable|date',
+            'project_id' => 'required|exists:projects,id',
+            'status' => 'nullable|string',
         ]);
 
         return Task::create([
+
             ...$validated,
-            'organisation_id' => $request->user()->organisation_id,
-            'created_by_client_id' => $request->user()->id,
+
+            'organisation_id' =>
+                $request->user()->organisation_id,
+
+            'created_by_client_id' =>
+                $request->user()->id,
+
+            'status' =>
+                $validated['status'] ?? 'pending',
         ]);
     }
 
-    public function show(Task $task)
+    public function show(Request $request, Task $task)
     {
-        $this->authorizeTask($task);
+        $visible = $this->visibleTasks($request)
+            ->whereKey($task->id)
+            ->first();
 
-        return $task;
+        abort_unless($visible, 403);
+
+        return $visible;
     }
 
     public function update(Request $request, Task $task)
     {
-        $this->authorizeTask($task);
+        $visible = $this->visibleTasks($request)
+            ->whereKey($task->id)
+            ->first();
 
-        $task->update($request->only([
-            'title',
-            'description',
-            'status',
-            'assigned_email',
-            'due_at',
-            'project_id',
-        ]));
+        abort_unless($visible, 403);
 
-        return $task;
+        $validated = $request->validate([
+            'title' => 'sometimes|string',
+            'description' => 'nullable|string',
+            'status' => 'nullable|string',
+            'assigned_email' => 'nullable|email',
+            'due_at' => 'nullable|date',
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
+
+        $visible->update($validated);
+
+        return $visible->fresh();
     }
 
-    public function destroy(Task $task)
+    public function destroy(Request $request, Task $task)
     {
-        $this->authorizeTask($task);
+        $visible = $this->visibleTasks($request)
+            ->whereKey($task->id)
+            ->first();
 
-        $task->delete();
+        abort_unless($visible, 403);
+
+        $visible->delete();
 
         return response()->noContent();
-    }
-
-    private function authorizeTask(Task $task)
-    {
-        abort_unless(
-            $task->organisation_id === auth()->user()->organisation_id,
-            403
-        );
     }
 
     private function visibleTasks(Request $request)
@@ -84,27 +102,54 @@ class TaskController extends Controller
         $client = $request->user();
 
         $query = Task::query()
+
             ->where(
                 'organisation_id',
                 $client->organisation_id
-            );
+            )
 
-        // Admin/global within organisation
+            // project visibility rules
+            ->whereHas('project', function ($projectQuery) use ($request, $client) {
+
+                // public projects
+                $projectQuery->where('is_private', false);
+
+                // optionally allow owned private projects
+                if (
+                    $client->can_lookup_assigned_tasks &&
+                    $request->filled('owner_email')
+                ) {
+
+                    $projectQuery->orWhere(function ($private) use ($request) {
+
+                        $private
+                            ->where('is_private', true)
+                            ->where(
+                                'owner_email',
+                                $request->owner_email
+                            );
+                    });
+                }
+            });
+
+        // organisation-wide visibility
         if ($client->can_view_all_tasks) {
             return $query;
         }
 
-        // Personal task lookup
+        // assigned task lookup
         if (
             $client->can_lookup_assigned_tasks &&
             $request->filled('assigned_email')
         ) {
+
             return $query->where(
                 'assigned_email',
                 $request->assigned_email
             );
         }
 
-        return $query;
+        // default: no access
+        return $query->whereRaw('1 = 0');
     }
 }
