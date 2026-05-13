@@ -17,6 +17,10 @@ class ApiClient extends Authenticatable
         'client_secret',
     ];
 
+    protected $casts = [
+        'organisation_id' => 'integer',
+    ];
+
     public function organisation()
     {
         return $this->belongsTo(Organisation::class);
