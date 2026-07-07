@@ -269,5 +269,5 @@ return [
         'private_key' => env('VAPID_PRIVATE_KEY'),
         'subject'     => env('VAPID_SUBJECT'),
     ],
-
+    'organisation_slug' => env('PWA_ORGANISATION_SLUG'),
 ];

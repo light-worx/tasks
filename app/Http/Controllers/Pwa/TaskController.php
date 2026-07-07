@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Pwa;
 
+use App\Http\Controllers\Pwa\Concerns\ScopesToOrganisation;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskStatus;
@@ -16,6 +17,7 @@ use Lightworx\FilamentPwa\Models\UserPreference;
 
 class TaskController extends Controller
 {
+    use ScopesToOrganisation;
     /**
      * "My tasks" — everything assigned to the signed-in person, across
      * all projects. Optional ?status= and ?project_id= filters for the
@@ -251,14 +253,5 @@ class TaskController extends Controller
             || $project->tasks()->where('assigned_email', $email)->exists();
 
         abort_unless($allowed, 403, 'You don\'t have access to this project.');
-    }
-
-    private function organisationId(): int
-    {
-        static $id;
-
-        return $id ??= \App\Models\Organisation::where('slug', config('pwa.organisation_slug'))
-            ->value('id')
-            ?? abort(500, 'pwa.organisation_slug is not configured or does not match an organisation.');
     }
 }

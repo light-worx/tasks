@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'pwa.identity' => RequirePwaIdentity::class,
         ]);
+
+        $middleware->encryptCookies(except: [
+            'pwa_device_id',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

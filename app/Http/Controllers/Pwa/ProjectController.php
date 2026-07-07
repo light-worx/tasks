@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pwa;
 
+use App\Http\Controllers\Pwa\Concerns\ScopesToOrganisation;
 use App\Models\Organisation;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    use ScopesToOrganisation;
+
     /**
      * Projects visible to the signed-in person:
      *   - projects they own (owner_email matches)
@@ -144,21 +147,5 @@ class ProjectController extends Controller
             403,
             'Only the project owner can do this.'
         );
-    }
-
-    /**
-     * Resolve the single organisation this PWA deployment serves.
-     *
-     * Assumes one organisation per PWA install (matching the subdomain-per-app
-     * routing pattern already in use). Cached per-request to avoid repeat
-     * lookups across index/show calls in the same request lifecycle.
-     */
-    private function organisationId(): int
-    {
-        static $id;
-
-        return $id ??= Organisation::where('slug', config('pwa.organisation_slug'))
-            ->value('id')
-            ?? abort(500, 'pwa.organisation_slug is not configured or does not match an organisation.');
     }
 }
