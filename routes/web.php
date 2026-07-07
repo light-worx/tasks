@@ -30,5 +30,6 @@ Route::domain('app.' . parse_url(config('app.url'), PHP_URL_HOST))
             Route::get('/tasks/{task}/edit',    [TaskController::class, 'edit'])->name('app.tasks.edit');
             Route::put('/tasks/{task}',         [TaskController::class, 'update'])->name('app.tasks.update');
             Route::patch('/tasks/{task}/status',[TaskController::class, 'updateStatus'])->name('app.tasks.status');
+            Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('app.tasks.destroy');
         });
     });
