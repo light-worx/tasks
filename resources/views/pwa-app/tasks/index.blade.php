@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="white-space:nowrap;">
-        <a href="{{ route('app.tasks') }}"
+        <a href="{{ route('app.home') }}"
            class="btn btn-sm {{ request('status') ? 'btn-outline-dark' : 'btn-dark' }}">All</a>
         @foreach($statuses as $status)
             <a href="{{ route('app.tasks', ['status' => $status->id]) }}"

@@ -58,9 +58,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'nav_items' => [
-        ['label' => 'Home',     'icon' => 'bi-house',        'route' => 'app.home'],
+        ['label' => 'Tasks',     'icon' => 'bi-check2-square',        'route' => 'app.home'],
         ['label' => 'Projects', 'icon' => 'bi-kanban',       'route' => 'app.projects'],
-        ['label' => 'My tasks', 'icon' => 'bi-check2-square','route' => 'app.tasks'],
     ],
 
     /*
@@ -82,9 +81,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'bottom_items' => [
-        ['icon' => 'bi-house',         'route' => 'app.home',     'label' => 'Home'],
+        ['icon' => 'bi-check2-square',         'route' => 'app.home',     'label' => 'Tasks'],
         ['icon' => 'bi-kanban',        'route' => 'app.projects', 'label' => 'Projects'],
-        ['icon' => 'bi-check2-square', 'route' => 'app.tasks',    'label' => 'Tasks'],
         ['icon' => 'bi-chat-left-text','route' => 'app.messages', 'label' => 'Inbox', 'badge' => 'messages'],
     ],
 
