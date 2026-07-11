@@ -154,6 +154,13 @@
     @stack('head')
 </head>
 <body>
+    @php
+        $showUserMenu = config('pwa.user_menu.enabled') ?? (
+            ! empty(config('pwa.user_fields', []))
+            || config('pwa.push.enabled', true)
+            || config('pwa.messages.enabled', true)
+        );
+    @endphp
 
     {{-- Top toolbar --}}
     @include('pwa::components.top-toolbar')
@@ -165,7 +172,9 @@
 
     {{-- Right slide menu (user settings) --}}
     <div class="slide-menu right" id="rightMenu">
-        @include('pwa::components.user-menu')
+        @if($showUserMenu)
+            @include('pwa::components.user-menu')
+        @endif
     </div>
 
     {{-- Backdrop --}}
@@ -184,10 +193,11 @@
 
     {{-- Core scripts --}}
     <script src="{{ asset('pwa/js/bootstrap.bundle.min.js') }}"></script>
-    <script> 
-        if ('serviceWorker' in navigator) { 
-            navigator.serviceWorker.register('/pwa/service-worker.js'); 
-        } 
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/pwa/service-worker.js');
+        }
     </script>
     <script>
         /* ── Slide menu wiring ─────────────────────────────────────── */
@@ -220,7 +230,9 @@
     </script>
 
     {{-- Push + install logic --}}
-    <script src="{{ asset('pwa/js/push-notifications.js') }}"></script>
+    @if(config('pwa.push.enabled', true))
+        <script src="{{ asset('pwa/js/push-notifications.js') }}"></script>
+    @endif
 
     @stack('scripts')
 </body>
