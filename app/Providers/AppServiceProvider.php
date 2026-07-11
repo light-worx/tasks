@@ -64,7 +64,10 @@ class AppServiceProvider extends ServiceProvider
                 return [];
             }
 
-            return Project::where(fn ($q) => $q->where('owner_email', $email)
+            $organisationId = \App\Models\Organisation::where('slug', config('pwa.organisation_slug'))->value('id');
+
+            return Project::where('organisation_id', $organisationId)
+                ->where(fn ($q) => $q->where('owner_email', $email)
                     ->orWhere('is_private', false)
                     ->orWhereHas('tasks', fn ($q2) => $q2->where('assigned_email', $email)))
                 ->orderBy('name')
