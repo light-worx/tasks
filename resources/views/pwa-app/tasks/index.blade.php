@@ -15,7 +15,7 @@
     @if($contexts->isNotEmpty())
     <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="white-space:nowrap;">
         <a href="{{ route('app.home', request()->except('context')) }}"
-        class="btn btn-sm {{ request('context') ? 'btn-outline-dark' : 'btn-dark' }}">Any context</a>
+        class="btn btn-sm {{ request('context') ? 'btn-outline-dark' : 'btn-dark' }}">All</a>
         @foreach($contexts as $context)
             <a href="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}" class="btn btn-sm {{ request('context') == $context->id ? 'btn-dark' : 'btn-outline-dark' }}">
                 {{ '@' . $context->label }}
