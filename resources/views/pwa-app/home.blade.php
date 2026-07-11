@@ -33,7 +33,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="fw-semibold">{{ $task->title }}</div>
-                    <div class="small text-muted">{{ $task->project->name }}</div>
+                    <div class="small text-muted mb-3">{{ $task->project?->name ?? 'No project' }}</div>
                 </div>
                 <span class="badge rounded-pill text-bg-light">
                     {{ \Carbon\Carbon::parse($task->due_at)->diffForHumans() }}

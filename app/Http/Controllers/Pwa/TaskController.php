@@ -43,10 +43,8 @@ class TaskController extends Controller
 
     public function create(Request $request): View
     {
-        // Only projects the person can actually file a task against —
-        // same visibility rule as ProjectController::index.
         $email = $request->pwaPreference->email;
-
+        $defaults = $request->pwaPreference->custom_settings ?? [];
         $projects = Project::where('organisation_id', $this->organisationId())
             ->where(function ($q) use ($email) {
                 $q->where('owner_email', $email)
@@ -59,7 +57,13 @@ class TaskController extends Controller
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
         $contexts = TaskContext::where('owner_email', $email)->where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('pwa-app.tasks.create', compact('projects', 'statuses', 'contexts'));
+        $task = new Task([
+            'status'     => $defaults['default_status']  ?? null,
+            'context_id' => $defaults['default_context'] ?? null,
+            'project_id' => $defaults['default_project']  ?? null,
+        ]);
+
+        return view('pwa-app.tasks.create', compact('projects', 'statuses', 'contexts', 'task'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -67,15 +71,19 @@ class TaskController extends Controller
         $data = $request->validate([
             'title'          => 'required|string|max:255',
             'description'    => 'nullable|string|max:5000',
-            'project_id'     => 'required|exists:projects,id',
+            'project_id'     => 'nullable|exists:projects,id',   // was required
             'due_at'         => 'nullable|date',
             'assigned_email' => 'nullable|email',
-            'status' => 'nullable|exists:task_statuses,id',
-            'context_id'     => 'nullable|exists:task_contexts,id'
+            'status'         => 'nullable|exists:task_statuses,id',
+            'context_id'     => 'nullable|exists:task_contexts,id',
         ]);
 
-        $project = Project::findOrFail($data['project_id']);
-        $this->authorizeProjectAccess($request, $project);
+        $project = null;
+
+        if (! empty($data['project_id'])) {
+            $project = Project::findOrFail($data['project_id']);
+            $this->authorizeProjectAccess($request, $project);
+        }
 
         $defaultStatus = TaskStatus::where('is_active', true)->orderBy('sort_order')->first();
 
@@ -83,20 +91,16 @@ class TaskController extends Controller
             'title'           => $data['title'],
             'description'     => $data['description'] ?? null,
             'due_at'          => $data['due_at'] ?? null,
-            'project_id'      => $project->id,
-            'organisation_id' => $project->organisation_id,
-            // Defaults to self-assignment; lets the creator hand it to
-            // someone else on the same project in one step.
+            'project_id'      => $project?->id,
+            'organisation_id' => $project?->organisation_id ?? $this->organisationId(),
             'assigned_email'  => $data['assigned_email'] ?? $request->pwaPreference->email,
-            'status' => $data['status'] ?? $defaultStatus->id,
-            'context_id'      => $data['context_id'] ?? null
+            'status'          => $data['status'] ?? $defaultStatus->id,
+            'context_id'      => $data['context_id'] ?? null,
         ]);
 
         $this->notifyAssignee($task, $request->pwaPreference);
 
-        return redirect()
-            ->route('app.home')
-            ->with('status', 'Task created.');
+        return redirect()->route('app.home')->with('status', 'Task created.');
     }
 
     public function show(Request $request, Task $task): View
@@ -159,26 +163,21 @@ class TaskController extends Controller
     {
         $this->authorizeVisible($request, $task);
 
-        // Anyone who can see the task (assignee or project owner) can move
-        // its status — editing title/description/assignee is more restricted.
-        $data = $request->validate([
-            'status' => 'required|exists:task_statuses,id',
-        ]);
-
+        $data = $request->validate(['status' => 'required|exists:task_statuses,id']);
         $task->update($data);
 
-        // Let the project owner know their task moved, unless they're the
-        // one who just moved it.
-        $owner = UserPreference::where('email', $task->project->owner_email)->first();
+        if ($task->project) {
+            $owner = UserPreference::where('email', $task->project->owner_email)->first();
 
-        if ($owner && $owner->email !== $request->pwaPreference->email) {
-            PushNotification::toPreference(
-                $owner,
-                'Task updated',
-                "\"{$task->title}\" is now {$task->status}.",
-                url: route('app.tasks.show', $task, absolute: false),
-                senderName: $request->pwaPreference->name,
-            );
+            if ($owner && $owner->email !== $request->pwaPreference->email) {
+                PushNotification::toPreference(
+                    $owner,
+                    'Task updated',
+                    "\"{$task->title}\" is now {$task->status}.",
+                    url: route('app.tasks.show', $task, absolute: false),
+                    senderName: $request->pwaPreference->name,
+                );
+            }
         }
 
         return response()->json(['status' => 'ok', 'task_status' => $task->status]);
@@ -229,7 +228,7 @@ class TaskController extends Controller
         $email = $request->pwaPreference->email;
 
         $visible = $task->assigned_email === $email
-            || $task->project->owner_email === $email;
+            || $task->project?->owner_email === $email;   // was $task->project->owner_email
 
         abort_unless($visible, 403, 'You don\'t have access to this task.');
     }

@@ -32,7 +32,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'assigned_email' => 'required|email',
             'due_at' => 'nullable|date',
-            'project_id' => 'required|exists:projects,id',
+            'project_id' => 'nullable|exists:projects,id',
             'status' => 'nullable|string',
         ]);
 
@@ -102,34 +102,23 @@ class TaskController extends Controller
         $client = $request->user();
 
         $query = Task::query()
+            ->where('organisation_id', $client->organisation_id)
+            ->where(function ($outer) use ($request, $client) {
 
-            ->where(
-                'organisation_id',
-                $client->organisation_id
-            )
+                // tasks with no project at all — always visible within the org
+                $outer->whereNull('project_id')
 
-            // project visibility rules
-            ->whereHas('project', function ($projectQuery) use ($request, $client) {
+                    // or tasks whose project passes the existing visibility rule
+                    ->orWhereHas('project', function ($projectQuery) use ($request, $client) {
+                        $projectQuery->where('is_private', false);
 
-                // public projects
-                $projectQuery->where('is_private', false);
-
-                // optionally allow owned private projects
-                if (
-                    $client->can_lookup_assigned_tasks &&
-                    $request->filled('owner_email')
-                ) {
-
-                    $projectQuery->orWhere(function ($private) use ($request) {
-
-                        $private
-                            ->where('is_private', true)
-                            ->where(
-                                'owner_email',
-                                $request->owner_email
-                            );
+                        if ($client->can_lookup_assigned_tasks && $request->filled('owner_email')) {
+                            $projectQuery->orWhere(function ($private) use ($request) {
+                                $private->where('is_private', true)
+                                    ->where('owner_email', $request->owner_email);
+                            });
+                        }
                     });
-                }
             });
 
         // organisation-wide visibility

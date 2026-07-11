@@ -19,9 +19,7 @@
         <p class="text-muted small">No projects yet.</p>
     @endforelse
 
-    <a href="{{ route('app.projects.create') }}"
-       class="btn btn-dark rounded-circle position-fixed d-flex align-items-center justify-content-center"
-       style="width:56px;height:56px;right:20px;bottom:76px;box-shadow:0 4px 12px rgba(0,0,0,.25);">
+    <a href="{{ route('app.projects.create') }}" class="btn btn-dark rounded-circle position-fixed d-flex align-items-center justify-content-center" style="width:56px;height:56px;left:50%;transform:translateX(-50%);bottom:32px; box-shadow:0 4px 12px rgba(0,0,0,.35);z-index:1040; border:3px solid white">
         <i class="bi bi-plus fs-3"></i>
     </a>
 @endsection

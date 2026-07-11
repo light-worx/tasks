@@ -2,25 +2,54 @@
 @php($title = 'My tasks')
 
 @section('content')
-    <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="white-space:nowrap;">
-        <a href="{{ route('app.home') }}"
-           class="btn btn-sm {{ request('status') ? 'btn-outline-dark' : 'btn-dark' }}">All</a>
-        @foreach($statuses as $status)
-            <a href="{{ route('app.tasks', ['status' => $status->id]) }}"
-               class="btn btn-sm {{ request('status') == $status->id ? 'btn-dark' : 'btn-outline-dark' }}">
-                {{ $status->label }}
-            </a>
-        @endforeach
+    <div class="d-flex gap-2 mb-2">
+        <select class="form-select form-select-sm w-auto" onchange="location.href=this.value">
+            <option value="{{ route('app.home', request()->except('status')) }}"
+                {{ ! request('status') ? 'selected' : '' }}>All statuses</option>
+            @foreach($statuses as $status)
+                <option value="{{ route('app.home', array_merge(request()->except('status'), ['status' => $status->id])) }}"
+                    {{ request('status') == $status->id ? 'selected' : '' }}>
+                    {{ $status->label }}
+                </option>
+            @endforeach
+        </select>
+
+        @if($contexts->isNotEmpty())
+        <select class="form-select form-select-sm w-auto" onchange="location.href=this.value">
+            <option value="{{ route('app.home', request()->except('context')) }}"
+                {{ ! request('context') ? 'selected' : '' }}>All contexts</option>
+            @foreach($contexts as $context)
+                <option value="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}"
+                    {{ request('context') == $context->id ? 'selected' : '' }}>
+                    {{ '@' . $context->label }}
+                </option>
+            @endforeach
+        </select>
+        @endif
     </div>
-    @if($contexts->isNotEmpty())
-    <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="white-space:nowrap;">
-        <a href="{{ route('app.home', request()->except('context')) }}"
-        class="btn btn-sm {{ request('context') ? 'btn-outline-dark' : 'btn-dark' }}">All</a>
-        @foreach($contexts as $context)
-            <a href="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}" class="btn btn-sm {{ request('context') == $context->id ? 'btn-dark' : 'btn-outline-dark' }}">
-                {{ '@' . $context->label }}
+
+    @if(request('status') || request('context'))
+    <div class="d-flex gap-2 mb-3">
+        @if(request('status'))
+            @php($activeStatus = $statuses->firstWhere('id', request('status')))
+            @if($activeStatus)
+            <a href="{{ route('app.home', request()->except('status')) }}"
+            class="badge rounded-pill text-decoration-none"
+            style="background:{{ $activeStatus->colour ?? '#6b7280' }};">
+                {{ $activeStatus->label }} <i class="bi bi-x"></i>
             </a>
-        @endforeach
+            @endif
+        @endif
+
+        @if(request('context'))
+            @php($activeContext = $contexts->firstWhere('id', request('context')))
+            @if($activeContext)
+            <a href="{{ route('app.home', request()->except('context')) }}"
+            class="badge rounded-pill text-bg-light border text-decoration-none">
+                {{ '@' . $activeContext->label }} <i class="bi bi-x"></i>
+            </a>
+            @endif
+        @endif
     </div>
     @endif
     @forelse($tasks as $task)
@@ -28,7 +57,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="fw-semibold">{{ $task->title }}</div>
-                    <div class="small text-muted">{{ $task->project->name }}</div>
+                    <div class="small text-muted">{{ $task->project?->name ?? 'No project' }}</div>
                 </div>
                 <div class="d-flex flex-column align-items-end gap-1">
                     <span class="badge rounded-pill"
@@ -53,10 +82,7 @@
     @empty
         <p class="text-muted small">No tasks here yet.</p>
     @endforelse
-
-    <a href="{{ route('app.tasks.create') }}"
-       class="btn btn-dark rounded-circle position-fixed d-flex align-items-center justify-content-center"
-       style="width:56px;height:56px;right:20px;bottom:76px;box-shadow:0 4px 12px rgba(0,0,0,.25);">
+    <a href="{{ route('app.tasks.create') }}" class="btn btn-dark rounded-circle position-fixed d-flex align-items-center justify-content-center" style="width:56px;height:56px;left:50%;transform:translateX(-50%);bottom:32px; box-shadow:0 4px 12px rgba(0,0,0,.35);z-index:1040; border:3px solid white">
         <i class="bi bi-plus fs-3"></i>
     </a>
 @endsection

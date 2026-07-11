@@ -4,7 +4,7 @@
 @section('content')
     <div class="card p-3 mb-3">
         <h1 class="h5 mb-1">{{ $task->title }}</h1>
-        <div class="small text-muted mb-3">{{ $task->project->name }}</div>
+        <div class="small text-muted mb-3">{{ $task->project?->name ?? 'No project' }}</div>
 
         @if($task->description)
             <p>{{ $task->description }}</p>

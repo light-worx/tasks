@@ -113,22 +113,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'user_fields' => [
-        // Static list
-        // ['type' => 'select', 'key' => 'colour', 'label' => 'Favourite colour',
-        //  'options' => ['red' => 'Red', 'green' => 'Green', 'blue' => 'Blue']],
-
-        // Dynamic (resolver called at render time, options embedded in HTML)
-        // ['type' => 'select', 'key' => 'region', 'label' => 'Region',
-        //  'options' => 'dynamic'],
-
-        // Dynamic + searchable (AJAX, supports large lists)
-        // ['type' => 'select', 'key' => 'product', 'label' => 'Product',
-        //  'options' => 'dynamic', 'searchable' => true,
-        //  'placeholder' => 'Search products…'],
-
-        // Other field types
-        // ['type' => 'text',   'key' => 'department', 'label' => 'Department'],
-        // ['type' => 'toggle', 'key' => 'dark_mode',  'label' => 'Dark mode'],
+        ['type' => 'select', 'key' => 'default_status',  'label' => 'Default status',  'options' => 'dynamic'],
+        ['type' => 'select', 'key' => 'default_context',  'label' => 'Default context', 'options' => 'dynamic'],
+        ['type' => 'select', 'key' => 'default_project',  'label' => 'Default project', 'options' => 'dynamic'],
     ],
 
     /*

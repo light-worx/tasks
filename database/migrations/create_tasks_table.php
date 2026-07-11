@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('organisation_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('created_by_client_id')->nullable()->constrained('api_clients')->nullOnDelete();
             $table->foreignId('context_id')->nullable()->constrained('task_contexts')->nullOnDelete();
-            $table->foreignId('project_id');
+            $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }
