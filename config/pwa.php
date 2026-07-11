@@ -7,9 +7,9 @@ return [
     | App Identity
     |--------------------------------------------------------------------------
     */
-    'app_name'    => env('PWA_APP_NAME', env('APP_NAME', 'Tasks')),
-    'app_short'   => env('PWA_APP_SHORT', 'Tasks'),
-    'description' => env('PWA_DESCRIPTION', 'My Tasks PWA'),
+    'app_name'    => env('PWA_APP_NAME', env('APP_NAME', 'My App')),
+    'app_short'   => env('PWA_APP_SHORT', 'App'),
+    'description' => env('PWA_DESCRIPTION', 'A progressive web application'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,8 +32,8 @@ return [
     |   Root mount:    prefix='',    domain=null  → site.com/subscribe
     |--------------------------------------------------------------------------
     */
-    'route_prefix' => env('PWA_ROUTE_PREFIX', null),
-    'route_domain' => env('PWA_ROUTE_DOMAIN', 'app'),
+    'route_prefix' => env('PWA_ROUTE_PREFIX', 'app'),
+    'route_domain' => env('PWA_ROUTE_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
         'theme_color'  => env('PWA_THEME_COLOR',      '#1f2937'),
     ],
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Navigation — items rendered in the left slide menu
     |--------------------------------------------------------------------------
@@ -82,8 +82,7 @@ return [
     */
     'bottom_items' => [
         ['icon' => 'bi-check2-square',         'route' => 'app.home',     'label' => 'Tasks'],
-        ['icon' => 'bi-kanban',        'route' => 'app.projects', 'label' => 'Projects'],
-        ['icon' => 'bi-chat-left-text','route' => 'app.messages', 'label' => 'Inbox', 'badge' => 'messages'],
+        ['icon' => 'bi-kanban',        'route' => 'app.projects', 'label' => 'Projects']
     ],
 
     /*
@@ -214,6 +213,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Messages inbox
+    |--------------------------------------------------------------------------
+    */
+    'messages' => [
+        'enabled' => env('PWA_MESSAGES_ENABLED', true),
+    ],
+    /*
+    |--------------------------------------------------------------------------
     | Profile picture uploads
     |
     | When a user uploads or takes a new profile picture via the PWA panel,
@@ -267,5 +274,5 @@ return [
         'private_key' => env('VAPID_PRIVATE_KEY'),
         'subject'     => env('VAPID_SUBJECT'),
     ],
-    'organisation_slug' => env('PWA_ORGANISATION_SLUG'),
+
 ];
