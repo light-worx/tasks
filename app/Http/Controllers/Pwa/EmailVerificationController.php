@@ -45,7 +45,12 @@ class EmailVerificationController
             return response()->json(['message' => 'Incorrect or expired code.'], 422);
         }
 
-        $preference->update(['email_verified_at' => now(), 'phone_verification_pin' => null, 'pin_expires_at' => null]);
+        $preference->update([
+            'email_verified_at' => now(), 
+            'phone_verified'         => true,
+            'phone_verification_pin' => null, 
+            'pin_expires_at' => null
+        ]);
 
         $device = UserDevice::firstOrCreate(['device_id' => $data['device_id']]);
         $device->update(['user_preference_id' => $preference->id]);
