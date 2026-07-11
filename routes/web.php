@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Pwa\AppController;
+use App\Http\Controllers\Pwa\ContextController;
 use App\Http\Controllers\Pwa\ProjectController;
 use App\Http\Controllers\Pwa\TaskController;
 use App\Http\Controllers\Pwa\EmailVerificationController;
@@ -31,5 +31,9 @@ Route::domain('app.' . parse_url(config('app.url'), PHP_URL_HOST))
             Route::put('/tasks/{task}',         [TaskController::class, 'update'])->name('app.tasks.update');
             Route::patch('/tasks/{task}/status',[TaskController::class, 'updateStatus'])->name('app.tasks.status');
             Route::delete('/tasks/{task}',      [TaskController::class, 'destroy'])->name('app.tasks.destroy');
+            Route::get('/contexts',              [ContextController::class, 'index'])->name('app.contexts');
+            Route::post('/contexts',             [ContextController::class, 'store'])->name('app.contexts.store');
+            Route::put('/contexts/{context}',    [ContextController::class, 'update'])->name('app.contexts.update');
+            Route::delete('/contexts/{context}', [ContextController::class, 'destroy'])->name('app.contexts.destroy');
         });
     });

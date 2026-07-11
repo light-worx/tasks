@@ -12,7 +12,17 @@
             </a>
         @endforeach
     </div>
-
+    @if($contexts->isNotEmpty())
+    <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="white-space:nowrap;">
+        <a href="{{ route('app.home', request()->except('context')) }}"
+        class="btn btn-sm {{ request('context') ? 'btn-outline-dark' : 'btn-dark' }}">Any context</a>
+        @foreach($contexts as $context)
+            <a href="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}" class="btn btn-sm {{ request('context') == $context->id ? 'btn-dark' : 'btn-outline-dark' }}">
+                {{ '@' . $context->label }}
+            </a>
+        @endforeach
+    </div>
+    @endif
     @forelse($tasks as $task)
         <a href="{{ route('app.tasks.show', $task) }}" class="card mb-2 p-3 text-decoration-none text-body">
             <div class="d-flex justify-content-between align-items-start">
@@ -20,11 +30,19 @@
                     <div class="fw-semibold">{{ $task->title }}</div>
                     <div class="small text-muted">{{ $task->project->name }}</div>
                 </div>
-                <span class="badge rounded-pill"
-                      style="background:{{ $task->taskStatus?->colour ?? '#6b7280' }};">
-                    {{ $task->taskStatus?->label ?? $task->status }}
-                </span>
+                <div class="d-flex flex-column align-items-end gap-1">
+                    <span class="badge rounded-pill"
+                        style="background:{{ $task->taskStatus?->colour ?? '#6b7280' }};">
+                        {{ $task->taskStatus?->label ?? $task->status }}
+                    </span>
+                    @if($task->context)
+                        <span class="badge rounded-pill text-bg-light border">
+                            {{ '@' . $task->context->label }}
+                        </span>
+                    @endif
+                </div>
             </div>
+
             @if($task->due_at)
                 <div class="small text-muted mt-1">
                     <i class="bi bi-calendar-event"></i>

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Pwa;
 use App\Http\Controllers\Pwa\Concerns\ScopesToOrganisation;
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\TaskContext;
 use App\Models\TaskStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -28,17 +29,16 @@ class TaskController extends Controller
         $email = $request->pwaPreference->email;
 
         $tasks = Task::where('assigned_email', $email)
-            ->when($request->filled('status'), fn ($q) =>
-                $q->where('status', $request->string('status')))
-            ->when($request->filled('project_id'), fn ($q) =>
-                $q->where('project_id', $request->integer('project_id')))
-            ->with('project:id,name')
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->integer('status')))
+            ->when($request->filled('context'), fn ($q) => $q->where('context_id', $request->integer('context')))
+            ->with(['project:id,name', 'taskStatus', 'context'])
             ->orderByRaw('due_at IS NULL, due_at asc')
             ->get();
 
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $contexts = TaskContext::where('owner_email', $email)->where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('pwa-app.tasks.index', compact('tasks', 'statuses'));
+        return view('pwa-app.tasks.index', compact('tasks', 'statuses', 'contexts'));
     }
 
     public function create(Request $request): View
@@ -57,8 +57,9 @@ class TaskController extends Controller
             ->get(['id', 'name']);
 
         $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $contexts = TaskContext::where('owner_email', $email)->where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('pwa-app.tasks.create', compact('projects', 'statuses'));
+        return view('pwa-app.tasks.create', compact('projects', 'statuses', 'contexts'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -69,6 +70,8 @@ class TaskController extends Controller
             'project_id'     => 'required|exists:projects,id',
             'due_at'         => 'nullable|date',
             'assigned_email' => 'nullable|email',
+            'status' => 'nullable|exists:task_statuses,id',
+            'context_id'     => 'nullable|exists:task_contexts,id'
         ]);
 
         $project = Project::findOrFail($data['project_id']);
@@ -85,13 +88,14 @@ class TaskController extends Controller
             // Defaults to self-assignment; lets the creator hand it to
             // someone else on the same project in one step.
             'assigned_email'  => $data['assigned_email'] ?? $request->pwaPreference->email,
-            'status'          => $defaultStatus->id,
+            'status' => $data['status'] ?? $defaultStatus->id,
+            'context_id'      => $data['context_id'] ?? null
         ]);
 
         $this->notifyAssignee($task, $request->pwaPreference);
 
         return redirect()
-            ->route('app.tasks.show', $task)
+            ->route('app.home')
             ->with('status', 'Task created.');
     }
 
@@ -111,9 +115,12 @@ class TaskController extends Controller
     {
         $this->authorizeEdit($request, $task);
 
-        $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $email = $request->pwaPreference->email;
 
-        return view('pwa-app.tasks.edit', compact('task', 'statuses'));
+        $statuses = TaskStatus::where('is_active', true)->orderBy('sort_order')->get();
+        $contexts = TaskContext::where('owner_email', $email)->where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('pwa-app.tasks.edit', compact('task', 'statuses', 'contexts'));
     }
 
     public function update(Request $request, Task $task): RedirectResponse
@@ -125,6 +132,8 @@ class TaskController extends Controller
             'description'    => 'nullable|string|max:5000',
             'due_at'         => 'nullable|date',
             'assigned_email' => 'nullable|email',
+            'status'         => 'nullable|exists:task_statuses,id',
+            'context_id'     => 'nullable|exists:task_contexts,id'
         ]);
 
         $previousAssignee = $task->assigned_email;
@@ -137,7 +146,7 @@ class TaskController extends Controller
         }
 
         return redirect()
-            ->route('app.tasks.show', $task)
+            ->route('app.home')
             ->with('status', 'Task updated.');
     }
 

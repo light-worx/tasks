@@ -23,6 +23,37 @@
 </div>
 @endif
 
+@isset($statuses)
+<div class="mb-3">
+    <label class="form-label small">Status</label>
+    <select name="status" class="form-select" required>
+        @foreach($statuses as $status)
+            <option value="{{ $status->id }}"
+                {{ old('status', $task->status ?? '') == $status->id ? 'selected' : '' }}>
+                {{ $status->label }}
+            </option>
+        @endforeach
+    </select>
+</div>
+@endisset
+
+@isset($contexts)
+    @if($contexts->isNotEmpty())
+    <div class="mb-3">
+        <label class="form-label small">Context</label>
+        <select name="context_id" class="form-select">
+            <option value="">None</option>
+            @foreach($contexts as $context)
+                <option value="{{ $context->id }}"
+                    {{ old('context_id', $task->context_id ?? '') == $context->id ? 'selected' : '' }}>
+                    {{ '@' . $context->label }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    @endif
+@endisset
+
 <div class="mb-3">
     <label class="form-label small">Due date</label>
     <input type="date" name="due_at" class="form-control"

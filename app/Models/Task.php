@@ -23,4 +23,9 @@ class Task extends Model
     {
         return $this->belongsTo(TaskStatus::class, 'status', 'id');
     }
+
+    public function context()
+    {
+        return $this->belongsTo(TaskContext::class, 'context_id');
+    }
 }
