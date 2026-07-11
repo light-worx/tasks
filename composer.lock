@@ -3371,12 +3371,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/light-worx/filament-pwa.git",
-                "reference": "5f3ef6fc53a85b363c2f74d46ac74b3da5b9c512"
+                "reference": "18621340657fec42153377d2e20c37e6959baba0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/light-worx/filament-pwa/zipball/5f3ef6fc53a85b363c2f74d46ac74b3da5b9c512",
-                "reference": "5f3ef6fc53a85b363c2f74d46ac74b3da5b9c512",
+                "url": "https://api.github.com/repos/light-worx/filament-pwa/zipball/18621340657fec42153377d2e20c37e6959baba0",
+                "reference": "18621340657fec42153377d2e20c37e6959baba0",
                 "shasum": ""
             },
             "require": {
@@ -3425,7 +3425,7 @@
                 "issues": "https://github.com/light-worx/filament-pwa/issues",
                 "source": "https://github.com/light-worx/filament-pwa/tree/master"
             },
-            "time": "2026-07-11T05:17:56+00:00"
+            "time": "2026-07-11T06:07:38+00:00"
         },
         {
             "name": "livewire/livewire",

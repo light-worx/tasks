@@ -274,5 +274,5 @@ return [
         'private_key' => env('VAPID_PRIVATE_KEY'),
         'subject'     => env('VAPID_SUBJECT'),
     ],
-
+    'default_home_route' => env('PWA_DEFAULT_HOME_ROUTE', true),
 ];
