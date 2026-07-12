@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'app_name'    => env('PWA_APP_NAME', env('APP_NAME', 'My App')),
-    'app_short'   => env('PWA_APP_SHORT', 'App'),
+    'app_short'   => env('PWA_APP_SHORT', 'Tasks'),
     'description' => env('PWA_DESCRIPTION', 'A progressive web application'),
 
     /*
@@ -255,6 +255,8 @@ return [
     */
     'push_icon'  => env('PWA_PUSH_ICON',  '/pwa/icons/icon-192.png'),
     'push_badge' => env('PWA_PUSH_BADGE', '/pwa/icons/badge-72.png'),
+    'icon_192' => env('PWA_ICON_192', '/pwa/icons/icon-192.png'),
+    'icon_512' => env('PWA_ICON_512', '/pwa/icons/icon-512.png'),
 
     'vapid' => [
         'public_key'  => env('VAPID_PUBLIC_KEY'),

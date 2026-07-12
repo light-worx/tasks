@@ -37,3 +37,4 @@ Route::domain('app.' . parse_url(config('app.url'), PHP_URL_HOST))
             Route::delete('/contexts/{context}', [ContextController::class, 'destroy'])->name('app.contexts.destroy');
         });
     });
+    
