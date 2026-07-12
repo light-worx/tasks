@@ -2,29 +2,33 @@
 @php($title = 'My tasks')
 
 @section('content')
-    <div class="d-flex gap-2 mb-2">
-        <select class="form-select form-select-sm w-auto" onchange="location.href=this.value">
-            <option value="{{ route('app.home', request()->except('status')) }}"
-                {{ ! request('status') ? 'selected' : '' }}>All statuses</option>
-            @foreach($statuses as $status)
-                <option value="{{ route('app.home', array_merge(request()->except('status'), ['status' => $status->id])) }}"
-                    {{ request('status') == $status->id ? 'selected' : '' }}>
-                    {{ $status->label }}
-                </option>
-            @endforeach
-        </select>
+    <div class="row g-2 mb-2">
+        <div class="col-6">
+            <select class="form-select form-select-sm w-100" onchange="location.href=this.value">
+                <option value="{{ route('app.home', request()->except('status')) }}"
+                    {{ ! request('status') ? 'selected' : '' }}>All statuses</option>
+                @foreach($statuses as $status)
+                    <option value="{{ route('app.home', array_merge(request()->except('status'), ['status' => $status->id])) }}"
+                        {{ request('status') == $status->id ? 'selected' : '' }}>
+                        {{ $status->label }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
         @if($contexts->isNotEmpty())
-        <select class="form-select form-select-sm w-auto" onchange="location.href=this.value">
-            <option value="{{ route('app.home', request()->except('context')) }}"
-                {{ ! request('context') ? 'selected' : '' }}>All contexts</option>
-            @foreach($contexts as $context)
-                <option value="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}"
-                    {{ request('context') == $context->id ? 'selected' : '' }}>
-                    {{ '@' . $context->label }}
-                </option>
-            @endforeach
-        </select>
+        <div class="col-6">
+            <select class="form-select form-select-sm w-100" onchange="location.href=this.value">
+                <option value="{{ route('app.home', request()->except('context')) }}"
+                    {{ ! request('context') ? 'selected' : '' }}>All contexts</option>
+                @foreach($contexts as $context)
+                    <option value="{{ route('app.home', array_merge(request()->except('context'), ['context' => $context->id])) }}"
+                        {{ request('context') == $context->id ? 'selected' : '' }}>
+                        {{ '@' . $context->label }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
         @endif
     </div>
 
@@ -57,7 +61,9 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="fw-semibold">{{ $task->title }}</div>
-                    <div class="small text-muted">{{ $task->project?->name ?? 'No project' }}</div>
+                    @if($task->project)
+                        <div class="small text-muted">{{ $task->project->name }}</div>
+                    @endif
                 </div>
                 <div class="d-flex flex-column align-items-end gap-1">
                     <span class="badge rounded-pill"
