@@ -14,12 +14,22 @@
             <a href="{{ route('app.projects.edit', $project) }}" class="btn btn-outline-dark flex-fill btn-sm">
                 <i class="bi bi-pencil"></i> Edit
             </a>
-            <form method="POST" action="{{ route('app.projects.destroy', $project) }}" class="flex-fill"
-                  onsubmit="return confirm('Delete this project?')">
-                @csrf @method('DELETE')
-                <button class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-trash"></i> Delete</button>
-            </form>
+            <button type="button" class="btn btn-outline-danger flex-fill btn-sm"
+                    data-bs-toggle="modal" data-bs-target="#deleteProjectModal">
+                <i class="bi bi-trash"></i> Delete
+            </button>
         </div>
+
+        <form id="deleteProjectForm" method="POST" action="{{ route('app.projects.destroy', $project) }}" class="d-none">
+            @csrf @method('DELETE')
+        </form>
+
+        @include('pwa-app._confirm-modal', [
+            'id'      => 'deleteProjectModal',
+            'title'   => 'Delete this project?',
+            'message' => "\"{$project->name}\" will be permanently removed.",
+            'formId'  => 'deleteProjectForm',
+        ])
     @endif
 
     <h2 class="h6 text-muted mb-2">Tasks</h2>

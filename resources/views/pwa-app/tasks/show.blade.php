@@ -36,12 +36,22 @@
             <a href="{{ route('app.tasks.edit', $task) }}" class="btn btn-outline-dark flex-fill">
                 <i class="bi bi-pencil"></i> Edit
             </a>
-            <form method="POST" action="{{ route('app.tasks.destroy', $task) }}" class="flex-fill"
-                  onsubmit="return confirm('Delete this task?')">
-                @csrf @method('DELETE')
-                <button class="btn btn-outline-danger w-100"><i class="bi bi-trash"></i> Delete</button>
-            </form>
+            <button type="button" class="btn btn-outline-danger flex-fill"
+                    data-bs-toggle="modal" data-bs-target="#deleteTaskModal">
+                <i class="bi bi-trash"></i> Delete
+            </button>
         </div>
+
+        <form id="deleteTaskForm" method="POST" action="{{ route('app.tasks.destroy', $task) }}" class="d-none">
+            @csrf @method('DELETE')
+        </form>
+
+        @include('pwa-app._confirm-modal', [
+            'id'      => 'deleteTaskModal',
+            'title'   => 'Delete this task?',
+            'message' => "\"{$task->title}\" will be permanently removed.",
+            'formId'  => 'deleteTaskForm',
+        ])
     @endif
 @endsection
 
