@@ -56,16 +56,18 @@
         @endif
     </div>
     @endif
+    {{-- tasks/index.blade.php --}}
     @forelse($tasks as $task)
         <a href="{{ route('app.tasks.show', $task) }}" class="card mb-2 p-3 text-decoration-none text-body">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <div style="min-width:0;">
                     <div class="fw-semibold">{{ $task->title }}</div>
                     @if($task->project)
                         <div class="small text-muted">{{ $task->project->name }}</div>
                     @endif
                 </div>
-                <div class="d-flex flex-column align-items-end gap-1">
+
+                <div class="d-flex flex-wrap justify-content-end gap-1">
                     <span class="badge rounded-pill"
                         style="background:{{ $task->taskStatus?->colour ?? '#6b7280' }};">
                         {{ $task->taskStatus?->label ?? $task->status }}
