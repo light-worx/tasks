@@ -68,15 +68,15 @@
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-end gap-1">
-                    <span class="badge rounded-pill"
-                        style="background:{{ $task->taskStatus?->colour ?? '#6b7280' }};">
-                        {{ $task->taskStatus?->label ?? $task->status }}
-                    </span>
                     @if($task->context)
                         <span class="badge rounded-pill text-bg-light border">
                             {{ '@' . $task->context->label }}
                         </span>
                     @endif
+                    <span class="badge rounded-pill"
+                        style="background:{{ $task->taskStatus?->colour ?? '#6b7280' }};">
+                        {{ $task->taskStatus?->label ?? $task->status }}
+                    </span>
                 </div>
             </div>
 
