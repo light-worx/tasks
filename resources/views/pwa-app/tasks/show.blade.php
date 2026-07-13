@@ -20,10 +20,10 @@
         </div>
 
         <label class="form-label small text-muted">Status</label>
-        <div class="btn-group w-100 mb-2" role="group">
+        <div class="d-flex flex-wrap gap-2 mb-3">
             @foreach($statuses as $status)
                 <button type="button"
-                        class="btn btn-sm status-btn {{ $task->status == $status->id ? 'btn-dark' : 'btn-outline-dark' }}"
+                        class="btn btn-sm rounded-pill status-btn {{ $task->status == $status->id ? 'btn-dark' : 'btn-outline-dark' }}"
                         data-status="{{ $status->id }}">
                     {{ $status->label }}
                 </button>
