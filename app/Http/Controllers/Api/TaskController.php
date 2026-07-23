@@ -33,7 +33,7 @@ class TaskController extends Controller
             'assigned_email' => 'required|email',
             'due_at' => 'nullable|date',
             'project_id' => 'nullable|exists:projects,id',
-            'status' => 'nullable|string',
+            'status' => 'nullable|string|exists:task_statuses,id',
         ]);
 
         return Task::create([
