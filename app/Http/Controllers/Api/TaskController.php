@@ -73,7 +73,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string',
             'description' => 'nullable|string',
-            'status' => 'nullable|string',
+            'status' => 'nullable|string|exists:task_statuses,id',
             'assigned_email' => 'nullable|email',
             'due_at' => 'nullable|date',
             'project_id' => 'nullable|exists:projects,id',
