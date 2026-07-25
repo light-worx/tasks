@@ -34,6 +34,7 @@ class TaskController extends Controller
             'due_at' => 'nullable|date',
             'project_id' => 'nullable|exists:projects,id',
             'status' => 'nullable|string|exists:task_statuses,id',
+            'context_id'     => 'nullable|exists:task_contexts,id',
         ]);
 
         return Task::create([
@@ -77,6 +78,7 @@ class TaskController extends Controller
             'assigned_email' => 'nullable|email',
             'due_at' => 'nullable|date',
             'project_id' => 'nullable|exists:projects,id',
+            'context_id'     => 'nullable|exists:task_contexts,id',
         ]);
 
         $visible->update($validated);
